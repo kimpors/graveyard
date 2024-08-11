@@ -1,11 +1,15 @@
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <linux/limits.h>
+#include <sys/dir.h>
+#include <unistd.h>
 #include "util.h"
+#include <fcntl.h>
+#include <sys/stat.h>
 #include "db.h"
 
+#define MAX_PATH 	1024
 #define MAX_DBS		100
 
 char path[PATH_MAX];
@@ -185,6 +189,58 @@ int get_data(const Db *db, const Tb *tb, Data *data)
 	fclose(fp);
 	return len;
 }
+
+void refresh(void)
+{
+	Db *dbtemp;
+	Tb *tbtemp;
+	char name[MAX_PATH];
+	struct dirent *dp;
+	DIR *dfd;
+
+	if ((dfd = opendir(path)) == NULL)
+	{
+		fprintf(stderr, "refresh: can't open %s\n", path);
+		return;
+	}
+
+	printf("\ndatabases\n");
+	while ((dp = readdir(dfd)) != NULL)
+	{
+		if (strcmp(dp->d_name, ".") == 0 ||
+				strcmp(dp->d_name, "..") == 0)
+		{
+			continue;
+		}
+
+		printf("%s\n", dp->d_name);
+		dbs[len].name = dp->d_name;
+
+		if ((dfd = opendir(path)) == NULL)
+		{
+			fprintf(stderr, "refresh: can't open %s\n", path);
+			return;
+		}
+
+		printf("tables\n");
+		while ((dp = readdir(dfd)) != NULL)
+		{
+			if (strcmp(dp->d_name, ".") == 0 ||
+					strcmp(dp->d_name, "..") == 0)
+			{
+				continue;
+			}
+
+			printf("%s\n", dp->d_name);
+			dbs[len].tables[dbs[len].len]->name = dp->d_name;
+			dbs[len].tables[dbs[len].len]->len = readtb(&dbs[len], dbs[len].tables[dbs[len].len], dbs[len].tables[dbs[len].len]->fields);
+			dbs[len].len++;
+		}
+
+		len++;
+	}
+}
+
 
 // TODO make it better
 void showdbs(void)

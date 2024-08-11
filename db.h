@@ -29,6 +29,7 @@ typedef struct {
 	Tb *tables[MAX];
 } Db;
 
+void refresh(void);
 Db *createdb(const char *name);
 Tb *createtb(Db *db, const char *name);
 void showdbs(void);
