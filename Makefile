@@ -1,12 +1,9 @@
-grave.c: db.c util.c
-	gcc grave.c db.c util.c -o a.out
-
-db.c:
-	gcc db.c
-
-util.c:
-	gcc util.c
+all: grave.c
+	gcc grave.c components/*.c utils/*.c -o all
 
 clean:
-	rm *.so
-	rm *.out
+	rm -f all
+
+update:
+	rm -f all
+	gcc grave.c components/*.c utils/*.c -o all

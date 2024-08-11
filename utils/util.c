@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include "db.h"
 
 static struct stat state;
 
@@ -16,4 +15,3 @@ void create_dir(const char *path)
 		}
 	}
 }
-
