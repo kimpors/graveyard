@@ -1,9 +1,9 @@
 all: grave.c
-	gcc grave.c components/*.c utils/*.c -o all
+	gcc main.c grave.c utils.c comp/*.c 
 
 clean:
-	rm -f all
+	rm -f a.out
 
 update:
-	rm -f all
-	gcc grave.c components/*.c utils/*.c -o all
+	rm -f a.out
+	gcc main.c grave.c utils.c comp/*.c
