@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "utils.h"
 
 #define LEN			16
@@ -59,6 +61,17 @@ typedef struct {
 	Type type[LEN];
 } Fl;
 
-void printdb(const Db *db);
-void printtb(const Tb *tb);
-void printfl(const Fl *fl);
+static Db db;
+static Tb tbs[HASH];
+static Fl fls[HASH];
+static char base[MAXPATH];
+
+void setdb(const char *name);
+void settb(const char *name);
+void setfl(const char *tbname, const Fl fields);
+
+Tb *gettb(const char *name);
+Fl *getfl(const char *tbname);
+void getdt(const char *tbname);
+
+void refresh(const char *name);
