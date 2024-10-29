@@ -11,8 +11,13 @@ static Dt data[DATA];
 
 int main(int argc, char *argv[])
 {
+#ifdef __linux__
 	strcpy(base, getpwuid(getuid())->pw_dir);
 	strcat(base, "/.local/share/graveyard");
+#elif _WIN32
+	strcpy(base, "C:\ProgramData\Graveyard");
+#endif
+
 	mkdirv(base);
 	refresh("temp");
 
