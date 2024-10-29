@@ -1,11 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include <pwd.h>
+#include "file_io.h"
 #include "grave.h"
-#include "utils.h"
 
 void writedt(const char *tbname);
 void getdt(const char *tbname);

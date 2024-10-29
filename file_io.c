@@ -3,10 +3,11 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include "utils.h"
+#include "file_io.h"
 
 static struct stat state;
 static char path[MAXPATH];
+char base[MAXPATH];
 
 int isdir(const char *fmt, ...)
 {

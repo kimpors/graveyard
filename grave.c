@@ -1,4 +1,9 @@
+#include "file_io.h"
 #include "grave.h"
+
+Db db;
+Tb tbs[HASH];
+Fl fls[HASH];
 
 u32 hash(const char *s)
 {
@@ -99,7 +104,7 @@ void readtb(const char name[NAME])
 		fprintf(stderr, "readtb: can't open %s/%s/%s\n", base, db.name, name);
 		exit(-1);
 	}
-	
+
 	strcpy(tbs[hash(name)].name, name);
 }
 

@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "utils.h"
 
 #define LEN			16
 #define NAME 		32
@@ -61,10 +60,9 @@ typedef struct {
 	Type type[LEN];
 } Fl;
 
-static Db db;
-static Tb tbs[HASH];
-static Fl fls[HASH];
-static char base[MAXPATH];
+extern Db db;
+extern Tb tbs[HASH];
+extern Fl fls[HASH];
 
 void setdb(const char *name);
 void settb(const char *name);
