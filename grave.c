@@ -15,15 +15,3 @@ void printfl(const Fl *fl)
 {
 	printf("fl: %s|%d\n", fl->name, fl->type);
 }
-
-void printdt(Type type, Data dt)
-{
-	switch (type) {
-        case INT:
-			printf("%d\t", dt.n);
-			break;
-        case FLOAT:
-			printf("%f\t", dt.f);
-          break;
-    }
-}

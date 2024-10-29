@@ -8,7 +8,7 @@
 static struct stat state;
 static char path[MAXPATH];
 
-int check_dir(const char *fmt, ...)
+int isdir(const char *fmt, ...)
 {
 	va_list ap;
 
@@ -19,7 +19,7 @@ int check_dir(const char *fmt, ...)
 	return stat(path, &state) != -1;
 }
 
-void create_dir(const char *fmt, ...)
+void mkdirv(const char *fmt, ...)
 {
 	va_list ap;
 
@@ -37,7 +37,7 @@ void create_dir(const char *fmt, ...)
 	}
 }
 
-FILE *create_file(const char *mode, const char *fmt, ...)
+FILE *fopenv(const char *mode, const char *fmt, ...)
 {
 	FILE *fp;
 	va_list ap;
@@ -48,44 +48,13 @@ FILE *create_file(const char *mode, const char *fmt, ...)
 
 	if ((fp = fopen(path, mode)) == NULL)
 	{
-		fprintf(stderr, "create_file: can't create file %s\n", path);
-		exit(-1);
+		fprintf(stderr, "fopenv: can't create file %s\n", path);
 	}
 
 	return fp;
 }
 
-void dirwalk(void (*fcn)(const char *), const char *fmt, ...)
-{
-	va_list ap;
-	DIR *dfd;
-	struct dirent *dp;
-
-	va_start(ap, fmt);
-	vsprintf(path, fmt, ap);
-	va_end(ap);
-
-	if ((dfd = opendir(path)) == NULL)
-	{
-		fprintf(stderr, "dirwalk: can't open %s\n", path);
-		exit(-1);
-	}
-
-	while ((dp = readdir(dfd)) != NULL)
-	{
-		if (strcmp(dp->d_name, ".") == 0 ||
-				strcmp(dp->d_name, "..") == 0)
-		{
-			continue;
-		}
-
-		(*fcn)(dp->d_name);
-	}
-
-	closedir(dfd);
-}
-
-int sdirwalk(char dest[][MAXPATH], const char *fmt, ...)
+int dirwalk(void (*fnc) (const char *name), const char *fmt, ...)
 {
 	int i = 0;
 	va_list ap;
@@ -110,7 +79,7 @@ int sdirwalk(char dest[][MAXPATH], const char *fmt, ...)
 			continue;
 		}
 
-		strcpy(dest[i++], dp->d_name);
+		fnc(dp->d_name);
 	}
 
 	closedir(dfd);
