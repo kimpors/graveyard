@@ -1,9 +1,18 @@
-all: grave.c
-	gcc main.c grave.c file_io.c
+.PHONY = all
+
+CC = gcc
+CFLAGS += -Wall -g
+OBJ = main.o
+
+all: build/$(OBJ)
+	$(CC) $^ -o build/all
+
+run: all
+	./build/all
+
+build/$(OBJ): build/%.o: src/%.c
+	$(CC) -c $^ -o $@
 
 clean:
-	rm -f a.out
+	rm -f *.o all
 
-update:
-	rm -f a.out
-	gcc main.c grave.c file_io.c
