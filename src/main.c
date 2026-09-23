@@ -21,6 +21,11 @@ typedef enum {
 } StatementType;
 
 typedef struct {
+  char *data;
+  size_t len;
+  size_t cap;
+} InputBuffer;
+typedef struct {
   StatementType type;
 } Statement;
 
@@ -34,15 +39,24 @@ CommandResult execute_command(char *buf)
   return COMMAND_UNRECOGNIZED;
 }
 
-PrepareResult prepare_statement(char *buf, Statement *st)
+PrepareResult prepare_statement(InputBuffer *buf, Statement *st)
 {
 
-  if (!strncmp(buf, "insert", 6))
+  if (!strncmp(buf->data, "insert", 6))
   {
     st->type = STATEMENT_INSERT;
+
+    int args = sscanf(buf->data, "insert %ld %s %s",
+                      &(st->row.id), st->row.name, st->row.email);
+
+    if (args < 3)
+    {
+      return PREPARE_SYNTAX_ERROR;
+    }
+
     return PREPARE_SUCCESS;
   }
-  else if (!strncmp(buf, "select", 6))
+  else if (!strncmp(buf->data, "select", 6))
   {
     st->type = STATEMENT_SELECT;
     return PREPARE_SUCCESS;
@@ -56,32 +70,48 @@ void execute_statement(Statement *st)
   switch (st->type)
   {
     case STATEMENT_INSERT:
-      puts("Insert statement executed");
-    break;
+    return execute_insert(st, tb);
     case STATEMENT_SELECT:
-      puts("Select statement executed");
-    break;
+    return execute_select(st, tb);
   }
+InputBuffer *new_buffer()
+{
+  InputBuffer *buf = malloc(sizeof(InputBuffer));
+  buf->data = NULL;
+  buf->len = 0;
+  buf->cap = 0;
+  return buf;
+}
 }
 
 int main(void) 
 {
+  int len;
+  InputBuffer *buf = new_buffer();
+  Table *tb = new_table();
   printf("### Graveyard ###\n");
-
-  char buf[BUFLEN];
 
   do 
   {
     printf("> ");
-    scanf("%255s", buf);
+    len = getline(&(buf->data), &(buf->cap), stdin);
 
-    if (buf[0] == ';')
+    if (len <= 0)
+    {
+      puts("Error reading input");
+      exit(EXIT_FAILURE);
+    }
+
+    buf->len = len - 1;
+    buf->data[len - 1] = '\0';
+
+    if (buf->data[0] == ';')
     {
       switch (execute_command(buf))
       {
         case COMMAND_SUCCESS: break;
         case COMMAND_UNRECOGNIZED:
-          printf("Unrecognized keyword int a command: '%s'\n", buf);
+          printf("[Error]Unrecognized keyword int a command: '%s'\n", buf->data);
         continue;
       }
     }
@@ -90,13 +120,23 @@ int main(void)
     switch(prepare_statement(buf, &st))
     {
       case PREPARE_SUCCESS: break;
+      case PREPARE_SYNTAX_ERROR:
+        printf("[Error]Could not parse statement: '%s'\n", buf->data);
+      continue;
       case PREPARE_UNRECOGNIZED:
-        printf("Unrecognized keyword in a statement: '%s'\n", buf);
+        printf("[Error]Unrecognized keyword in a statement: '%s'\n", buf->data);
       continue;
     }
 
-    execute_statement(&st);
-    puts("=====");
+    switch(execute_statement(&st, tb))
+    {
+      case EXECUTE_SUCCESS:
+        puts("(Executed)");
+      break;
+      case EXECUTE_TABLE_FULL:
+        printf("[Error]Table is full");
+      break;
+    }
   }while (true);
 
   return 0;
