@@ -75,14 +75,28 @@ int main(void)
     printf("> ");
     scanf("%255s", buf);
 
-    if (!strcmp(buf, ";exit"))
+    if (buf[0] == ';')
     {
-      break;
+      switch (execute_command(buf))
+      {
+        case COMMAND_SUCCESS: break;
+        case COMMAND_UNRECOGNIZED:
+          printf("Unrecognized keyword int a command: '%s'\n", buf);
+        continue;
+      }
     }
-    else 
+
+    Statement st;
+    switch(prepare_statement(buf, &st))
     {
-      printf("Unexpected command: '%s'\n", buf);
+      case PREPARE_SUCCESS: break;
+      case PREPARE_UNRECOGNIZED:
+        printf("Unrecognized keyword in a statement: '%s'\n", buf);
+      continue;
     }
+
+    execute_statement(&st);
+    puts("=====");
   }while (true);
 
   return 0;
