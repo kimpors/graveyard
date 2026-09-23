@@ -1,7 +1,7 @@
 .PHONY = all
 
 CC = gcc
-CFLAGS += -Wall -g
+CFLAGS += -Wall -gdwarf-2 -g3
 OBJ = main.o
 
 all: build/$(OBJ)
@@ -11,8 +11,8 @@ run: all
 	./build/all
 
 build/$(OBJ): build/%.o: src/%.c
-	$(CC) -c $^ -o $@
+	$(CC) -c $^ $(CFLAGS) -o $@
 
 clean:
-	rm -f *.o all
+	rm -f build/*
 
