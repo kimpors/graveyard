@@ -3,7 +3,12 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define BUFLEN 256
+#define sizeof_attr(STRUCT, ATTRIBUTE)  sizeof(((STRUCT*)0)->ATTRIBUTE)
+
+#define COL_NAME_LEN                    32
+#define COL_EMAIL_LEN                   255
+#define PAGE_SIZE                       4096
+#define TABLE_PAGES_COUNT               100
 
 typedef enum {
   COMMAND_SUCCESS,
@@ -12,7 +17,8 @@ typedef enum {
 
 typedef enum {
   PREPARE_SUCCESS,
-  PREPARE_UNRECOGNIZED
+  PREPARE_UNRECOGNIZED,
+  PREPARE_SYNTAX_ERROR
 } PrepareResult;
 
 typedef enum {
@@ -20,21 +26,77 @@ typedef enum {
   STATEMENT_SELECT
 } StatementType;
 
+typedef enum {
+  EXECUTE_SUCCESS,
+  EXECUTE_TABLE_FULL
+} ExecuteResult;
+
 typedef struct {
   char *data;
   size_t len;
   size_t cap;
 } InputBuffer;
+
+typedef struct {
+  size_t id;
+  char name[COL_NAME_LEN];
+  char email[COL_EMAIL_LEN];
+} Row;
+
 typedef struct {
   StatementType type;
+  Row row;
 } Statement;
 
 typedef struct {
   size_t rows;
   void *pages[TABLE_PAGES_COUNT];
 } Table;
+
+const unsigned ID_SIZE          = sizeof_attr(Row, id);
+const unsigned NAME_SIZE        = sizeof_attr(Row, name);
+const unsigned EMAIL_SIZE       = sizeof_attr(Row, email);
+
+const unsigned ID_OFFSET        = 0;
+const unsigned NAME_OFFSET      = ID_OFFSET + ID_SIZE;
+const unsigned EMAIL_OFFSET     = NAME_OFFSET + NAME_SIZE;
+const unsigned ROW_SIZE         = ID_SIZE + NAME_SIZE + EMAIL_SIZE;
+
+const unsigned ROWS_PER_PAGE    = PAGE_SIZE / ROW_SIZE;
+const unsigned TABLE_ROW_COUNT  = ROWS_PER_PAGE / TABLE_PAGES_COUNT;
+
+void serialize_row(Row *src, void *dst)
 {
-  if (!strcmp(buf, ";exit"))
+  memcpy(dst + ID_OFFSET, &(src->id), ID_SIZE);
+  memcpy(dst + NAME_OFFSET, &(src->name), NAME_SIZE);
+  memcpy(dst + EMAIL_OFFSET, &(src->email), EMAIL_OFFSET);
+}
+
+void deserialize_row(void *src, Row *dst)
+{
+  memcpy(&(dst->id), src + ID_OFFSET, ID_SIZE);
+  memcpy(&(dst->name), src + NAME_OFFSET, NAME_SIZE);
+  memcpy(&(dst->email), src + EMAIL_OFFSET, EMAIL_SIZE);
+}
+
+void *row_slot(Table *tb, size_t row_index)
+{
+  size_t index = row_index / ROWS_PER_PAGE;
+  void *page = tb->pages[index];
+
+  if (!page)
+  {
+    page = tb->pages[index] = malloc(PAGE_SIZE);
+  }
+
+  size_t row_offset = row_index % ROWS_PER_PAGE;
+  size_t byte_offset = row_offset * ROW_SIZE;
+  return page + byte_offset;
+}
+
+CommandResult execute_command(InputBuffer *buf)
+{
+  if (!strcmp(buf->data, ";exit"))
   {
     exit(EXIT_SUCCESS);
   }
@@ -68,7 +130,32 @@ PrepareResult prepare_statement(InputBuffer *buf, Statement *st)
   return PREPARE_UNRECOGNIZED;
 }
 
-void execute_statement(Statement *st)
+ExecuteResult execute_insert(Statement *st, Table *tb)
+{
+  if (tb->rows >= TABLE_PAGES_COUNT)
+  {
+    return EXECUTE_TABLE_FULL;
+  }
+
+  serialize_row(&(st->row), row_slot(tb, tb->rows));
+  tb->rows++;
+
+  return EXECUTE_SUCCESS;
+}
+
+ExecuteResult execute_select(Statement *st, Table *tb)
+{
+  Row row;
+  for (size_t i = 0; i < tb->rows; i++)
+  {
+    deserialize_row(row_slot(tb, i), &row);
+    printf("(%ld, %s, %s)\n", row.id, row.name, row.email);
+  }
+
+  return EXECUTE_SUCCESS;
+}
+
+ExecuteResult execute_statement(Statement *st, Table *tb)
 {
   switch (st->type)
   {
@@ -77,6 +164,10 @@ void execute_statement(Statement *st)
     case STATEMENT_SELECT:
     return execute_select(st, tb);
   }
+
+  return EXECUTE_SUCCESS;
+}
+
 InputBuffer *new_buffer()
 {
   InputBuffer *buf = malloc(sizeof(InputBuffer));
