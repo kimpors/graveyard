@@ -1,17 +1,20 @@
-.PHONY = all
+.PHONY = all run
 
 CC = gcc
-CFLAGS += -Wall -gdwarf-2 -g3
-OBJ = main.o
+CFLAGS += -Wall -gdwarf-2 -g3 -Iinclude
+BUILD = build
+TARGET = all
 
-all: build/$(OBJ)
-	$(CC) $^ -o build/all
+OBJ = main.o input-buffer.o command.o statement.o row.o table.o
+
+all: $(OBJ)
+	$(CC) $(foreach wrd,$(OBJ),$(BUILD)/$(wrd)) -o $(BUILD)/$(TARGET)
 
 run: all
-	./build/all
+	./$(BUILD)/$(TARGET)
 
-build/$(OBJ): build/%.o: src/%.c
-	$(CC) -c $^ $(CFLAGS) -o $@
+$(OBJ): %.o: src/%.c
+	$(CC) -c $(CFLAGS) $< -o $(BUILD)/$@
 
 clean:
 	rm -f build/*
