@@ -1,0 +1,98 @@
+[
+  {
+    "file": "src/main.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-Wall",
+      "-gdwarf-2",
+      "-g3",
+      "-Iinclude",
+      "src/main.c",
+      "-o",
+      "build/main.o"
+    ],
+    "directory": "/home/kimpors/project/graveyard",
+    "output": "build/main.o"
+  },
+  {
+    "file": "src/input-buffer.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-Wall",
+      "-gdwarf-2",
+      "-g3",
+      "-Iinclude",
+      "src/input-buffer.c",
+      "-o",
+      "build/input-buffer.o"
+    ],
+    "directory": "/home/kimpors/project/graveyard",
+    "output": "build/input-buffer.o"
+  },
+  {
+    "file": "src/command.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-Wall",
+      "-gdwarf-2",
+      "-g3",
+      "-Iinclude",
+      "src/command.c",
+      "-o",
+      "build/command.o"
+    ],
+    "directory": "/home/kimpors/project/graveyard",
+    "output": "build/command.o"
+  },
+  {
+    "file": "src/statement.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-Wall",
+      "-gdwarf-2",
+      "-g3",
+      "-Iinclude",
+      "src/statement.c",
+      "-o",
+      "build/statement.o"
+    ],
+    "directory": "/home/kimpors/project/graveyard",
+    "output": "build/statement.o"
+  },
+  {
+    "file": "src/row.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-Wall",
+      "-gdwarf-2",
+      "-g3",
+      "-Iinclude",
+      "src/row.c",
+      "-o",
+      "build/row.o"
+    ],
+    "directory": "/home/kimpors/project/graveyard",
+    "output": "build/row.o"
+  },
+  {
+    "file": "src/table.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-Wall",
+      "-gdwarf-2",
+      "-g3",
+      "-Iinclude",
+      "src/table.c",
+      "-o",
+      "build/table.o"
+    ],
+    "directory": "/home/kimpors/project/graveyard",
+    "output": "build/table.o"
+  }
+]
