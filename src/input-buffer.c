@@ -13,10 +13,10 @@ void free_input_buffer(InputBuffer *buf)
   buf = NULL;
 }
 
-int readline(InputBuffer *buf)
+int readline(InputBuffer *buf, FILE *stream)
 {
   ssize_t readed;
-  readed = getline(&(buf->data), &(buf->cap), stdin);
+  readed = getline(&(buf->data), &(buf->cap), stream);
 
     if (readed <= 0)
     {

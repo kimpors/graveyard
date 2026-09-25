@@ -1,4 +1,5 @@
 #pragma once
+#include <stdio.h>
 #include <stdint.h>
 
 typedef struct {
@@ -7,6 +8,6 @@ typedef struct {
   uint64_t cap;
 } InputBuffer;
 
-int readline(InputBuffer *buf);
 InputBuffer *init_input_buffer(void);
 void free_input_buffer(InputBuffer *buf);
+int readline(InputBuffer *buf, FILE *stream);
