@@ -7,9 +7,27 @@
 #include "statement.h"
 #include "input-buffer.h"
 
+// int readline(InputBuffer *buf)
+// {
+//   ssize_t readed;
+//   readed = getline(&(buf->data), &(buf->cap), stdin);
+//
+//     if (readed <= 0)
+//     {
+//       puts("Error reading input");
+//       free_input_buffer(buf);
+//       return EXIT_FAILURE;
+//     }
+//
+//     buf->len = readed - 1;
+//     buf->data[readed - 1] = '\0';
+//
+//   return EXIT_SUCCESS;
+// }
+
+
 int main(void) 
 {
-  ssize_t readed;
   Table *tb = init_table();
   InputBuffer *buf = init_input_buffer();
 
@@ -18,18 +36,24 @@ int main(void)
   do 
   {
     printf("> ");
-    readed = getline(&(buf->data), &(buf->cap), stdin);
-
-    if (readed <= 0)
+    if (readline(buf))
     {
-      puts("Error reading input");
       free_input_buffer(buf);
       free_table(tb);
       exit(EXIT_FAILURE);
     }
-
-    buf->len = readed - 1;
-    buf->data[readed - 1] = '\0';
+    // readed = getline(&(buf->data), &(buf->cap), stdin);
+    //
+    // if (readed <= 0)
+    // {
+    //   puts("Error reading input");
+    //   free_input_buffer(buf);
+    //   free_table(tb);
+    //   exit(EXIT_FAILURE);
+    // }
+    //
+    // buf->len = readed - 1;
+    // buf->data[readed - 1] = '\0';
 
     if (buf->data[0] == ';')
     {
