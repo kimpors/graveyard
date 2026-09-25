@@ -9,17 +9,18 @@
 
 int main(void) 
 {
-  int len;
-  InputBuffer *buf = init_input_buffer();
+  ssize_t readed;
   Table *tb = init_table();
+  InputBuffer *buf = init_input_buffer();
+
   printf("### Graveyard ###\n");
 
   do 
   {
     printf("> ");
-    len = getline(&(buf->data), &(buf->cap), stdin);
+    readed = getline(&(buf->data), &(buf->cap), stdin);
 
-    if (len <= 0)
+    if (readed <= 0)
     {
       puts("Error reading input");
       free_input_buffer(buf);
@@ -27,8 +28,8 @@ int main(void)
       exit(EXIT_FAILURE);
     }
 
-    buf->len = len - 1;
-    buf->data[len - 1] = '\0';
+    buf->len = readed - 1;
+    buf->data[readed - 1] = '\0';
 
     if (buf->data[0] == ';')
     {
