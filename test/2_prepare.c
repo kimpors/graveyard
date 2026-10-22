@@ -40,12 +40,16 @@ void case2(void)
 
 void case3(void)
 {
-	fputs("insert 1 hello 12", fp);
+	fputs("insert 1 hello hello@example.com", fp);
 	rewind(fp);
 
 	TEST_ASSERT_EQUAL_INT(EXIT_SUCCESS, readline(buf, fp));
 	TEST_ASSERT_EQUAL_INT(PREPARE_SUCCESS, prepare_statement(buf, &st));
 	TEST_ASSERT_EQUAL_INT(STATEMENT_INSERT, st.type);
+
+	TEST_ASSERT_EQUAL_INT(1, st.row.id);
+	TEST_ASSERT_EQUAL_STRING("hello", st.row.name);
+	TEST_ASSERT_EQUAL_STRING("hello@example.com", st.row.email);
 }
 
 void case4(void)
