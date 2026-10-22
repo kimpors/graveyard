@@ -1,21 +1,42 @@
-.PHONY = all run
+CC := gcc
+CFLAGS := -Wall -gdwarf-2 -g3 -Iinclude -Iextern/Unity/src
 
-CC = gcc
-CFLAGS += -Wall -gdwarf-2 -g3 -Iinclude
-BUILD = build
-TARGET = all
+TARGET := all
+BUILD := build
+OBJ := $(BUILD)/obj
+BIN := $(BUILD)/bin
 
-OBJ = main.o input-buffer.o command.o statement.o row.o table.o
+SRC := $(wildcard src/*.c)
+TEST_SRC := $(wildcard test/*.c)
 
-all: $(OBJ)
-	$(CC) $(foreach wrd,$(OBJ),$(BUILD)/$(wrd)) -o $(BUILD)/$(TARGET)
+SRC_OBJ := $(SRC:src/%.c=$(OBJ)/%.o)
+TEST_BIN := $(TEST_SRC:test/%.c=$(BIN)/test/%)
+UNITY_OBJ := $(OBJ)/unity/unity.o
+
+$(shell mkdir -p $(OBJ) $(OBJ)/unity $(BIN) $(BIN)/test)
+
+.PHONY: all run clean test
+
+all: $(SRC_OBJ)
+	$(CC) $(SRC_OBJ) -o $(BIN)/$(TARGET)
 
 run: all
-	./$(BUILD)/$(TARGET)
+	./$(BIN)/$(TARGET)
 
-$(OBJ): %.o: src/%.c
-	$(CC) -c $(CFLAGS) $< -o $(BUILD)/$@
+test: $(TEST_BIN)
+	@for t in $(TEST_BIN); do \
+		echo "== $$t"; \
+		./$$t || exit 1; \
+	done
+
+$(TEST_BIN): $(BIN)/test/%: test/%.c $(filter-out $(OBJ)/main.o,$(SRC_OBJ)) $(UNITY_OBJ)
+	$(CC) $^ $(CFLAGS) -o $@
+
+$(SRC_OBJ): $(OBJ)/%.o: src/%.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+$(UNITY_OBJ): extern/Unity/src/unity.c
+	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
-	rm -f build/*
-
+	rm -rf build
