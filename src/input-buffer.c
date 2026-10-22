@@ -1,22 +1,28 @@
+#include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "input-buffer.h"
 
 InputBuffer *init_input_buffer(void)
 {
-  return calloc(1, sizeof(InputBuffer));
+	return calloc(1, sizeof(InputBuffer));
 }
 
 void free_input_buffer(InputBuffer *buf)
 {
-  free(buf);
-  buf = NULL;
+	if (buf)
+	{
+		buf->data = NULL;
+		buf->len = 0;
+		buf->cap = 0;
+		free(buf);
+	}
 }
 
 int readline(InputBuffer *buf, FILE *stream)
 {
-  ssize_t readed;
-  readed = getline(&(buf->data), &(buf->cap), stream);
+  	ssize_t readed;
+  	readed = getline(&(buf->data), &(buf->cap), stream);
 
     if (readed <= 0)
     {
@@ -25,8 +31,10 @@ int readline(InputBuffer *buf, FILE *stream)
       return EXIT_FAILURE;
     }
 
-    buf->len = readed - 1;
-    buf->data[readed - 1] = '\0';
+	while (isspace(buf->data[readed - 1])) readed--;
 
-  return EXIT_SUCCESS;
+    buf->len = readed;
+    buf->data[readed] = '\0';
+
+  	return EXIT_SUCCESS;
 }
