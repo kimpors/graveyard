@@ -15,13 +15,16 @@ UNITY_OBJ := $(OBJ)/unity/unity.o
 
 $(shell mkdir -p $(OBJ) $(OBJ)/unity $(BIN) $(BIN)/test)
 
-.PHONY: all run clean test
+.PHONY: all run debug test clean
 
 all: $(SRC_OBJ)
 	$(CC) $(SRC_OBJ) -o $(BIN)/$(TARGET)
 
 run: all
-	./$(BIN)/$(TARGET)
+	./$(BIN)/$(TARGET) mydb
+
+debug: all
+	gdb -q -ex 'lay src' -ex 'b main' -ex 'run' --args ./$(BIN)/$(TARGET) mydb
 
 test: $(TEST_BIN)
 	@for t in $(TEST_BIN); do \

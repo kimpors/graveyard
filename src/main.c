@@ -7,9 +7,16 @@
 #include "statement.h"
 #include "input-buffer.h"
 
-int main(void) 
+int main(int argc, char *argv[]) 
 {
-  Table *tb = init_table();
+	if (argc < 2)
+	{
+		printf("[Error]Must supply filename to database\n");
+		exit(EXIT_FAILURE);
+	}
+
+	Table *tb = db_open(argv[1]);
+
   InputBuffer *buf = init_input_buffer();
 
   printf("### Graveyard ###\n");
@@ -20,13 +27,13 @@ int main(void)
     if (readline(buf, stdin))
     {
       free_input_buffer(buf);
-      free_table(tb);
+	  db_close(tb);
       exit(EXIT_FAILURE);
     }
 
     if (buf->data[0] == ';')
     {
-      switch (execute_command(buf))
+      switch (execute_command(buf, tb))
       {
         case COMMAND_SUCCESS: break;
         case COMMAND_UNRECOGNIZED:
@@ -59,6 +66,6 @@ int main(void)
   }while (true);
 
   free_input_buffer(buf);
-  free_table(tb);
+  db_close(tb);
   return EXIT_SUCCESS;
 }

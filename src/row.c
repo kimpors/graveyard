@@ -18,13 +18,7 @@ void deserialize_row(void *src, Row *dst)
 void *row_slot(Table *tb, size_t row_index)
 {
   size_t index = row_index / ROWS_PER_PAGE;
-  void *page = tb->pages[index];
-
-  if (!page)
-  {
-    page = tb->pages[index] = malloc(PAGE_SIZE);
-  }
-
+  void *page = get_page(tb->pager, index);
   size_t row_offset = row_index % ROWS_PER_PAGE;
   size_t byte_offset = row_offset * ROW_SIZE;
   return page + byte_offset;

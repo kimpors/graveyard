@@ -14,7 +14,7 @@ static InputBuffer *buf;
 void setUp(void)
 {
 	buf = init_input_buffer();
-	tb = init_table();
+	tb = db_open("testdb");
 	fpin = tmpfile();
 	fpout = tmpfile();
 }
@@ -22,7 +22,7 @@ void setUp(void)
 void tearDown(void)
 {
 	free_input_buffer(buf);
-	free_table(tb);
+	db_close(tb);
 	fclose(fpout);
 	fclose(fpin);
 }
@@ -61,7 +61,7 @@ void case1(void)
 
 void case2(void)
 {
-	fputs("insert 1 hello hello@example.com\ninsert 2 bye bye@example.com", fpin);
+	fputs("insert 2 hello hello@example.com\ninsert 3 bye bye@example.com", fpin);
 	rewind(fpin);
 
 	TEST_ASSERT_EQUAL_INT(EXIT_SUCCESS, readline(buf, fpin));
@@ -76,10 +76,13 @@ void case2(void)
 	rewind(fpout);
 
 	readline(buf, fpout);
-	TEST_ASSERT_EQUAL_STRING("(1, hello, hello@example.com)", buf->data);
+	TEST_ASSERT_EQUAL_STRING("(1, hello, 12)", buf->data);
 
 	readline(buf, fpout);
-	TEST_ASSERT_EQUAL_STRING("(2, bye, bye@example.com)", buf->data);
+	TEST_ASSERT_EQUAL_STRING("(2, hello, hello@example.com)", buf->data);
+
+	readline(buf, fpout);
+	TEST_ASSERT_EQUAL_STRING("(3, bye, bye@example.com)", buf->data);
 }
 
 int main(void) 

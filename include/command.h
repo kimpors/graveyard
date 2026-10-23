@@ -1,4 +1,5 @@
 #pragma once
+#include "table.h"
 #include "input-buffer.h"
 
 typedef enum {
@@ -6,4 +7,4 @@ typedef enum {
   COMMAND_UNRECOGNIZED
 } CommandResult;
 
-CommandResult execute_command(InputBuffer *buf);
+CommandResult execute_command(InputBuffer *buf, Table *tb);

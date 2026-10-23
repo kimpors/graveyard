@@ -8,7 +8,7 @@ PrepareResult prepare_statement(InputBuffer *buf, Statement *st)
   {
     st->type = STATEMENT_INSERT;
 
-    int args = sscanf(buf->data, "insert %ld %s %s",
+    int args = sscanf(buf->data, "insert %ld %32s %255s",
                       &(st->row.id), st->row.name, st->row.email);
 
     if (args < 3)
